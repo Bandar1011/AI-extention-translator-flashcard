@@ -1,35 +1,53 @@
-# Hover Translator Chrome Extension
+Hover Translator Chrome Extension / ホバー翻訳クローム拡張機能
 
-A simple Chrome extension that allows you to hover over any word on a webpage to see its translation. You can also save words as two-sided flashcards to study them later.
+EN: A simple Chrome extension that lets you hover over any word on a webpage to see its translation. You can also save words as two-sided flashcards to study later.
+JP: ウェブページ上の単語にマウスをホバーすると、その場で翻訳が表示されるシンプルなChrome拡張機能です。さらに、単語を保存して「両面フラッシュカード」として学習できます。
 
-## Features
+Features / 機能
 
-- **Instant Translation:** Simply hover your mouse over a word to see its translation in a clean tooltip.
-- **Customizable Language:** Choose your desired target language from a wide range of options in the extension popup.
-- **Flashcard System:** Save words you want to remember. The extension creates two-sided, flippable flashcards.
-- **View & Manage Flashcards:** View all your saved flashcards directly in the popup. You can flip them to test yourself and delete them when you've mastered them.
+🌐 Instant Translation / 即時翻訳
+　カーソルを単語に重ねるだけで、ツールチップに翻訳が表示されます。
 
-## Installation
+⚙️ Customizable Language / 言語選択
+　拡張機能のポップアップから、好みのターゲット言語を選択できます。
 
-To install and test this extension locally, follow these steps:
+🃏 Flashcard System / フラッシュカード機能
+　気になる単語を保存し、自動で「表裏のあるフラッシュカード」に追加できます。
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/Bandar1011/hover-translator.git
-    ```
-2.  **Open Chrome Extensions:**
-    Navigate to `chrome://extensions` in your Chrome browser.
-3.  **Enable Developer Mode:**
-    Turn on the "Developer mode" toggle, which is usually in the top-right corner.
-4.  **Load the Extension:**
-    Click the "Load unpacked" button and select the `word-hover-extension` directory from the cloned repository.
+📖 View & Manage Flashcards / フラッシュカード管理
+　保存したカードをポップアップで一覧表示し、クリックで裏返して暗記練習。覚えたカードは削除可能。
 
-The extension icon should now appear in your Chrome toolbar.
+Installation / インストール方法
 
-## How to Use
+Clone the repository / リポジトリをクローン
 
-1.  **Set Your Language:** Click on the extension icon in your toolbar. Select your preferred target language from the dropdown and click "Save Language".
-2.  **Translate Words:** Go to any webpage and hover your mouse over a word. A small tooltip will appear with the translation.
-3.  **Save Flashcards:** In the translation tooltip, click the "Save to Flashcards" button to save the word and its translation.
-4.  **View Flashcards:** Open the extension popup again and click the "View My Flashcards" button. This will display your list of saved cards.
-5.  **Study:** Click on any flashcard to flip it over and see the translation. Click it again to see the original word. You can delete a card at any time using the "Delete" button. 
+git clone https://github.com/Bandar1011/hover-translator.git
+
+
+Open Chrome Extensions / Chrome拡張機能を開く
+Chromeのアドレスバーに chrome://extensions を入力。
+
+Enable Developer Mode / デベロッパーモードを有効化
+右上の「デベロッパーモード」をオンにします。
+
+Load the Extension / 拡張機能を読み込む
+「パッケージ化されていない拡張機能を読み込む」をクリックし、クローンした word-hover-extension フォルダを選択。
+
+→ ツールバーに拡張機能アイコンが表示されます。
+
+How to Use / 使い方
+
+Set Your Language / 言語を設定
+ツールバーのアイコンをクリックし、ドロップダウンからターゲット言語を選び「Save Language」を押します。
+
+Translate Words / 翻訳する
+任意のウェブページで単語にマウスをホバーすると、ツールチップに翻訳が表示されます。
+
+Save Flashcards / 単語を保存
+翻訳ツールチップの「Save to Flashcards」ボタンをクリックすると、その単語と訳語が保存されます。
+
+View Flashcards / フラッシュカードを見る
+拡張機能のポップアップを開き、「View My Flashcards」を押すと保存したカードの一覧が表示されます。
+
+Study / 学習
+カードをクリックすると裏返り、訳語と原語を切り替えられます。「Delete」で削除可能。
