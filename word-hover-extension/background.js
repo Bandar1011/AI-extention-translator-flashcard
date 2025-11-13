@@ -2,17 +2,10 @@
 // Load config.js (optional - only for development fallback)
 importScripts('config.js');
 
-// Helper function to get API key from storage (user-provided) or config (dev fallback)
-async function getApiKey() {
-  // First, try to get user-provided API key from storage
-  const storage = await chrome.storage.local.get(['geminiApiKey']);
-  if (storage.geminiApiKey && storage.geminiApiKey.trim()) {
-    return storage.geminiApiKey.trim();
-  }
-  
-  // Fallback to config.js (for development only)
+// Helper function to get API key from config.js (generated from .env file)
+function getApiKey() {
+  // Get API key from config.js (which is generated from .env file by build.js)
   if (typeof CONFIG !== 'undefined' && CONFIG.GEMINI_API_KEY) {
-    console.warn('⚠️  Using development API key from config.js. Users should provide their own key via settings.');
     return CONFIG.GEMINI_API_KEY;
   }
   
@@ -32,9 +25,9 @@ async function testAPIConnectivity() {
   console.log('🧪 Testing API connectivity...');
   
   try {
-    const apiKey = await getApiKey();
+    const apiKey = getApiKey();
     if (!apiKey) {
-      console.error('❌ API key not configured. Please provide your Gemini API key in extension settings.');
+      console.error('❌ API key not configured. Please add GEMINI_API_KEY to your .env file and run "npm run build"');
       return;
     }
     const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
@@ -118,10 +111,10 @@ async function handleTranslation(message, sendResponse) {
   let endpoint;
 
   try {
-    // Get API key from user storage (preferred) or config.js fallback (dev only)
-    apiKey = await getApiKey();
+    // Get API key from config.js (generated from .env file)
+    apiKey = getApiKey();
     if (!apiKey) {
-      throw new Error('API key not configured. Please provide your Gemini API key in extension settings.');
+      throw new Error('API key not configured. Please add GEMINI_API_KEY to your .env file and run "npm run build"');
     }
     endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
     

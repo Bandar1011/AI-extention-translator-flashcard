@@ -20,42 +20,47 @@ JP: ウェブページ上の単語にマウスをホバーすると、その場�
 
 ## Installation / インストール方法
 
+**Quick Setup (3 steps):**
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Bandar1011/hover-translator.git
    cd hover-translator
    ```
+   
+   > **Note:** After cloning, you won't have `config.js` yet (it's gitignored). You'll create it in step 2.
 
-2. **Install dependencies and build (optional - for development only):**
+2. **Add your API key and build:**
+   
+   Create a `.env` file in the root directory:
+   ```bash
+   echo "GEMINI_API_KEY=your_api_key_here" > .env
+   ```
+   
+   Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   
+   Then build the extension:
    ```bash
    npm install
    npm run build
    ```
-   > **Note:** The build step is optional. It generates `config.js` from `.env` for development convenience only. **No API keys are hardcoded in the extension** - users must provide their own.
+   
+   This reads your `.env` file and **generates `config.js`** (which didn't exist before). The extension needs `config.js` to work.
 
-3. **Open Chrome Extensions:**
-   Navigate to `chrome://extensions` in your Chrome browser.
+3. **Load in Chrome:**
+   - Open `chrome://extensions`
+   - Enable "Developer mode" (top right)
+   - Click "Load unpacked"
+   - Select the `word-hover-extension` folder
 
-4. **Enable Developer Mode:**
-   Turn on the "Developer mode" toggle, which is usually in the top-right corner.
+**That's it!** The extension is ready to use. Just hover over words on any webpage to translate them.
 
-5. **Load the Extension:**
-   Click the "Load unpacked" button and select the `word-hover-extension` directory from the cloned repository.
-
-6. **Configure Your API Key:**
-   - Click the extension icon in your toolbar
-   - Enter your Gemini API key in the settings (get one from [Google AI Studio](https://makersuite.google.com/app/apikey))
-   - Select your target language
-   - Click "Save Settings"
-
-The extension icon should now appear in your Chrome toolbar.
-
-> **Security Note:** This extension does NOT include any hardcoded API keys. Each user must provide their own Gemini API key via the extension settings. API keys are stored securely in Chrome's local storage (encrypted at rest) and never exposed in the extension bundle.
+> **Important:** Both `.env` and `config.js` are gitignored, so they stay local and won't be committed to git. Each user must create their own `.env` file and run `npm run build` to generate their own `config.js`.
 
 ## How to Use / 使い方
 
-1. **Configure API Key & Language / APIキーと言語を設定:**
-   Click on the extension icon in your toolbar. Enter your Gemini API key (required) and select your preferred target language from the dropdown, then click "Save Settings".
+1. **Set Your Language (Optional):**
+   Click on the extension icon in your toolbar and select your preferred target language from the dropdown, then click "Save Settings". Default is English.
 
 2. **Translate Words / 翻訳する:**
    Go to any webpage and hover your mouse over a word. A small tooltip will appear with the translation.
