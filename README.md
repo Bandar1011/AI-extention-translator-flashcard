@@ -16,15 +16,35 @@ To install and test this extension locally, follow these steps:
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/Bandar1011/hover-translator.git
+    cd hover-translator
     ```
-2.  **Open Chrome Extensions:**
+
+2.  **Set up environment variables:**
+    Create a `.env` file in the root directory with your Gemini API key:
+    ```bash
+    GEMINI_API_KEY=your_api_key_here
+    ```
+    > **Note:** The `.env` file is gitignored and will not be committed to version control.
+
+3.  **Install dependencies and build:**
+    ```bash
+    npm install
+    npm run build
+    ```
+    This will generate `word-hover-extension/config.js` from your `.env` file.
+
+4.  **Open Chrome Extensions:**
     Navigate to `chrome://extensions` in your Chrome browser.
-3.  **Enable Developer Mode:**
+
+5.  **Enable Developer Mode:**
     Turn on the "Developer mode" toggle, which is usually in the top-right corner.
-4.  **Load the Extension:**
+
+6.  **Load the Extension:**
     Click the "Load unpacked" button and select the `word-hover-extension` directory from the cloned repository.
 
 The extension icon should now appear in your Chrome toolbar.
+
+> **Important:** After making changes to `.env`, always run `npm run build` to regenerate `config.js` before reloading the extension.
 
 ## How to Use
 

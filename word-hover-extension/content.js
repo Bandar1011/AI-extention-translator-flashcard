@@ -20,6 +20,10 @@ let targetLanguage = 'English'; // default language
 let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
+// Track last interaction position and text for robust tooltip/save behavior
+let lastMouseX = 0;
+let lastMouseY = 0;
+let lastHighlightedText = '';
 
 function showTooltip(x, y, text, hiragana = '') {
   let tooltip = document.getElementById('word-hover-translation-tooltip');
@@ -193,6 +197,18 @@ function showTooltip(x, y, text, hiragana = '') {
             saveContainer.dataset.translation = text || '';
             saveContainer.dataset.hiragana = hiragana || '';
             saveContainer.dataset.targetLanguage = targetLanguage || '';
+            // Persist original selected text reliably using last captured highlight
+            if (lastHighlightedText && lastHighlightedText.trim()) {
+              saveContainer.dataset.original = lastHighlightedText.trim();
+            } else {
+              // Fallback to current selection if available
+              try {
+                const selectedOriginal = (window.getSelection && window.getSelection().toString().trim()) || '';
+                saveContainer.dataset.original = selectedOriginal;
+              } catch (e) {
+                saveContainer.dataset.original = '';
+              }
+            }
 
     // Create deck select dropdown
     const deckSelect = document.createElement('select');
@@ -350,7 +366,7 @@ function showTooltip(x, y, text, hiragana = '') {
           return;
         }
         // Save to selected deck
-        const originalText = window.getSelection().toString().trim();
+        const originalText = (saveContainer.dataset.original || '').trim();
         const selectedDeckId = deckSelect.value;
         
         if (originalText && selectedDeckId) {
@@ -431,13 +447,26 @@ function showTooltip(x, y, text, hiragana = '') {
     saveButton.addEventListener('click', safeInvoke, { capture: true });
     saveButton.addEventListener('click', safeInvoke, false);
     saveButton.onclick = safeInvoke;
+    // Fire handler on mousedown regardless of state to bypass pages that block click
     saveButton.addEventListener('mousedown', (ev) => {
-      // Fallback: if in Add state, immediately run handler on mousedown
-      if (saveButton.textContent === 'Add') {
+      ev.stopPropagation();
+      ev.preventDefault();
+      safeInvoke(ev);
+    }, { capture: true });
+    // Also handle pointerdown for broader device support
+    saveButton.addEventListener('pointerdown', (ev) => {
+      ev.stopPropagation();
+      ev.preventDefault();
+      safeInvoke(ev);
+    }, { capture: true });
+    // Keyboard accessibility (Enter/Space)
+    saveButton.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
         ev.stopPropagation();
+        ev.preventDefault();
         safeInvoke(ev);
       }
-    }, { capture: true });
+    });
     
     // Position the container near the tooltip
     const tooltipRect = tooltip.getBoundingClientRect();
@@ -505,6 +534,9 @@ let debounceTimer; // Timer for debouncing API requests
 let lastSelection = '';
 
 document.addEventListener('mouseup', async (event) => {
+  // Record last mouse position
+  lastMouseX = event.clientX;
+  lastMouseY = event.clientY;
   // If mouseup happened inside the save container, do nothing so the button click can fire
   if (event.target && event.target.closest && event.target.closest('.save-flashcard-container')) {
     return;
@@ -515,6 +547,7 @@ document.addEventListener('mouseup', async (event) => {
   // Only proceed if we have a new, non-empty selection that's different from the last one
   if (selection && currentSelection.length > 0 && currentSelection !== lastSelection) {
     lastSelection = currentSelection;
+    lastHighlightedText = currentSelection;
     const highlightedText = currentSelection;
     
     if (highlightedText.length > 500) {
@@ -537,26 +570,47 @@ document.addEventListener('mouseup', async (event) => {
     // Set a new timer to make the API call after a short delay
     debounceTimer = setTimeout(async () => {
       try {
-        const response = await chrome.runtime.sendMessage({
+        // Add a timeout wrapper to prevent hanging forever
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Translation timeout: Request took too long')), 35000); // 35 second timeout (slightly longer than background timeout)
+        });
+        
+        const messagePromise = chrome.runtime.sendMessage({
           action: 'translate',
           word: highlightedText,
           targetLanguage: targetLanguage
         });
         
+        const response = await Promise.race([messagePromise, timeoutPromise]);
+        
         const { translation, hiragana } = response || { translation: 'Translation failed', hiragana: '' };
         
-        // If the response was null, it means a request was ignored, so do nothing.
+        // If the response was null, it means a request was ignored, so show a message
         if (translation === null) {
+          showTooltip(lastMouseX || event.clientX, lastMouseY || event.clientY, 'Translation busy, please try again');
           return;
         }
 
-        // We need to re-calculate the tooltip position in case the user has scrolled
-        const latestSelection = window.getSelection().getRangeAt(0).getBoundingClientRect();
-        showTooltip(latestSelection.right, latestSelection.bottom, translation, hiragana);
+        // We need to re-calculate the tooltip position; fallback if selection vanished
+        let posX = lastMouseX || event.clientX;
+        let posY = lastMouseY || event.clientY;
+        try {
+          const range = window.getSelection().getRangeAt(0);
+          const rect = range.getBoundingClientRect();
+          if (rect && rect.right && rect.bottom) {
+            posX = rect.right;
+            posY = rect.bottom;
+          }
+        } catch (_) {}
+        showTooltip(posX, posY, translation, hiragana);
       } catch (error) {
         console.error('Translation error:', error);
         // Show error at the last known position
-        showTooltip(event.clientX, event.clientY, 'Translation error');
+        let errorMessage = 'Translation error';
+        if (error.message && error.message.includes('timeout')) {
+          errorMessage = 'Translation timeout: Request took too long';
+        }
+        showTooltip(lastMouseX || event.clientX, lastMouseY || event.clientY, errorMessage);
       }
     }, 1000); // 1000ms (1 second) delay
 
@@ -591,6 +645,7 @@ document.addEventListener('click', async (ev) => {
   try {
     const btn = ev.target && ev.target.closest && ev.target.closest('.save-flashcard-btn');
     if (!btn) return;
+    console.log('Global fallback: intercepted click on save button');
     ev.stopPropagation();
     ev.preventDefault();
 
@@ -625,7 +680,7 @@ document.addEventListener('click', async (ev) => {
         setTimeout(() => { select.style.transform = 'translateX(0)'; }, 150);
         return;
       }
-      const originalText = window.getSelection().toString().trim();
+      const originalText = (container.dataset.original || '').trim();
       const selectedDeckId = select.value;
       const newCard = {
         id: String(Date.now()),
