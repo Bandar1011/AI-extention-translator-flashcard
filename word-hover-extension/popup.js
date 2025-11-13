@@ -397,6 +397,15 @@ function showStatus(message, type) {
 
 async function loadInitialState() {
     try {
+        // Load API key from storage (stored in local, not sync, for security)
+        const apiKeyResult = await chrome.storage.local.get(['geminiApiKey']);
+        if (apiKeyResult.geminiApiKey) {
+            const apiKeyElement = document.getElementById('geminiApiKey');
+            if (apiKeyElement) {
+                apiKeyElement.value = apiKeyResult.geminiApiKey;
+            }
+        }
+        
         // Load language setting
         const langResult = await chrome.storage.sync.get(['targetLanguage']);
         if (langResult.targetLanguage) {
@@ -417,9 +426,23 @@ async function loadInitialState() {
 // --- SETTINGS ---
 
 async function saveSettings() {
+    const apiKey = document.getElementById('geminiApiKey')?.value?.trim() || '';
     const targetLanguage = document.getElementById('targetLanguage')?.value || 'Japanese';
+    
+    // Validate API key is provided
+    if (!apiKey) {
+        showStatus('Please enter your Gemini API key', 'error');
+        return;
+    }
+    
     try {
+        // Save API key to local storage (not sync, for security)
+        await chrome.storage.local.set({ geminiApiKey: apiKey });
+        
+        // Save language to sync storage
         await chrome.storage.sync.set({ targetLanguage: targetLanguage });
+        
+        // Notify content script about language change
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         if (tab) {
             await chrome.tabs.sendMessage(tab.id, {
@@ -427,9 +450,10 @@ async function saveSettings() {
                 targetLanguage: targetLanguage
             }).catch(err => console.log('Content script not ready yet.'));
         }
-        showStatus('Language saved successfully!', 'success');
+        
+        showStatus('Settings saved successfully!', 'success');
     } catch (error) {
         console.error('Error saving settings:', error);
-        showStatus('Error saving language', 'error');
+        showStatus('Error saving settings', 'error');
     }
 }

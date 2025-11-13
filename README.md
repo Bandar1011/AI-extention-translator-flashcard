@@ -26,37 +26,36 @@ JP: ウェブページ上の単語にマウスをホバーすると、その場�
    cd hover-translator
    ```
 
-2. **Set up environment variables:**
-   Create a `.env` file in the root directory with your Gemini API key:
-   ```bash
-   GEMINI_API_KEY=your_api_key_here
-   ```
-   > **Note:** The `.env` file is gitignored and will not be committed to version control.
-
-3. **Install dependencies and build:**
+2. **Install dependencies and build (optional - for development only):**
    ```bash
    npm install
    npm run build
    ```
-   This will generate `word-hover-extension/config.js` from your `.env` file.
+   > **Note:** The build step is optional. It generates `config.js` from `.env` for development convenience only. **No API keys are hardcoded in the extension** - users must provide their own.
 
-4. **Open Chrome Extensions:**
+3. **Open Chrome Extensions:**
    Navigate to `chrome://extensions` in your Chrome browser.
 
-5. **Enable Developer Mode:**
+4. **Enable Developer Mode:**
    Turn on the "Developer mode" toggle, which is usually in the top-right corner.
 
-6. **Load the Extension:**
+5. **Load the Extension:**
    Click the "Load unpacked" button and select the `word-hover-extension` directory from the cloned repository.
+
+6. **Configure Your API Key:**
+   - Click the extension icon in your toolbar
+   - Enter your Gemini API key in the settings (get one from [Google AI Studio](https://makersuite.google.com/app/apikey))
+   - Select your target language
+   - Click "Save Settings"
 
 The extension icon should now appear in your Chrome toolbar.
 
-> **Important:** After making changes to `.env`, always run `npm run build` to regenerate `config.js` before reloading the extension.
+> **Security Note:** This extension does NOT include any hardcoded API keys. Each user must provide their own Gemini API key via the extension settings. API keys are stored securely in Chrome's local storage (encrypted at rest) and never exposed in the extension bundle.
 
 ## How to Use / 使い方
 
-1. **Set Your Language / 言語を設定:**
-   Click on the extension icon in your toolbar. Select your preferred target language from the dropdown and click "Save Language".
+1. **Configure API Key & Language / APIキーと言語を設定:**
+   Click on the extension icon in your toolbar. Enter your Gemini API key (required) and select your preferred target language from the dropdown, then click "Save Settings".
 
 2. **Translate Words / 翻訳する:**
    Go to any webpage and hover your mouse over a word. A small tooltip will appear with the translation.
