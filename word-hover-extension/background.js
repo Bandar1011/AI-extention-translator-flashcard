@@ -101,13 +101,17 @@ async function handleTranslation(message, sendResponse) {
   // Close the gate
   isRequestInProgress = true;
 
+  // Declare apiKey and endpoint outside try block so they're accessible in catch block
+  let apiKey;
+  let endpoint;
+
   try {
     // Get API key from config (loaded from .env via build.js)
-    const apiKey = CONFIG.GEMINI_API_KEY;
+    apiKey = CONFIG.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error('API key not configured. Please run "npm run build" to generate config.js from .env');
     }
-    const endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
+    endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + apiKey;
     
     // New, clearer prompt with valid JSON examples to ensure reliable responses.
     const prompt = `Analyze the following text: "${message.word}".
@@ -247,8 +251,13 @@ Do not add any other text, explanations, or markdown formatting outside of the J
     console.error('Error Type:', errorMessage);
     console.error('Details:', debugInfo);
     console.error('Full Error:', err);
-    console.error('API Key (first 10 chars):', apiKey.substring(0, 10) + '...');
-    console.error('Endpoint:', endpoint);
+    // Only log apiKey and endpoint if they were successfully initialized
+    if (apiKey) {
+      console.error('API Key (first 10 chars):', apiKey.substring(0, 10) + '...');
+    }
+    if (endpoint) {
+      console.error('Endpoint:', endpoint);
+    }
     
     // Send detailed error back to content script
     if (typeof sendResponse === 'function') {

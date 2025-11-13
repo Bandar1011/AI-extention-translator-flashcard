@@ -713,7 +713,9 @@ document.addEventListener('scroll', () => {
   const tooltip = document.getElementById('word-hover-translation-tooltip');
   if (!tooltip) return;
 
-  const deckSelect = tooltip.querySelector('.deck-select');
+  // deck-select is in saveContainer which is appended to document.body, not inside tooltip
+  const saveContainer = document.querySelector('.save-flashcard-container');
+  const deckSelect = saveContainer?.querySelector('.deck-select');
   if (deckSelect && deckSelect.style.display === 'block') {
     return;
   }

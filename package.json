@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Chrome extension for translating words on hover",
   "scripts": {
-    "build": "node build.js",
-    "prebuild": "node build.js"
+    "build": "node build.js"
   },
   "devDependencies": {
     "dotenv": "^16.3.1"
